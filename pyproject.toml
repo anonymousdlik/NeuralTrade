@@ -1,0 +1,39 @@
+[project]
+name = "neuraltrade"
+version = "1.0.0"
+description = "Multi-Model AI Trading Framework — Autonomous agents for stock & crypto trading with intelligent model routing"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.10"
+dependencies = [
+    "langchain>=0.3.0",
+    "langgraph>=0.2.0",
+    "openai>=1.50.0",
+    "anthropic>=0.34.0",
+    "google-generativeai>=0.8.0",
+    "yfinance>=0.2.40",
+    "pandas>=2.2.0",
+    "numpy>=1.26.0",
+    "requests>=2.32.0",
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.9.0",
+    "rich>=13.8.0",
+    "typer>=0.12.0",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.30.0",
+    "plotly>=5.24.0",
+    "ta>=0.11.0",
+    "textblob>=0.18.0",
+    "feedparser>=6.0.0",
+    "aiohttp>=3.10.0",
+]
+
+[project.scripts]
+neuraltrade = "neuraltrade.cli.main:app"
+
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[tool.setuptools.packages.find]
+include = ["neuraltrade*"]

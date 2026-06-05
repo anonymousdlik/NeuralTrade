@@ -1,0 +1,2 @@
+"""NeuralTrade: Multi-Model AI Trading Framework."""
+__version__ = "1.0.0"
