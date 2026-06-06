@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass, field
-from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -74,6 +73,7 @@ class AppConfig:
     google_key: str = ""
     openrouter_key: str = ""
     groq_key: str = ""
+    deepseek_key: str = ""
 
     @classmethod
     def from_env(cls) -> AppConfig:
@@ -109,6 +109,7 @@ class AppConfig:
             google_key=os.getenv("GOOGLE_API_KEY", ""),
             openrouter_key=os.getenv("OPENROUTER_API_KEY", ""),
             groq_key=os.getenv("GROQ_API_KEY", ""),
+            deepseek_key=os.getenv("DEEPSEEK_API_KEY", ""),
         )
 
     def has_key(self, provider: str) -> bool:
@@ -119,5 +120,6 @@ class AppConfig:
             "google": self.google_key,
             "openrouter": self.openrouter_key,
             "groq": self.groq_key,
+            "deepseek": self.deepseek_key,
         }
         return bool(key_map.get(provider, ""))

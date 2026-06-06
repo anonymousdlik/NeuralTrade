@@ -51,7 +51,7 @@
 
 ---
 
-## Why NeuralTrading?
+## Why NeuralTrade?
 
 Most AI trading tools are either too simple or too rigid. NeuralTrade takes a different approach:
 

@@ -7,6 +7,7 @@ import json
 from typing import Optional
 
 import typer
+import pandas as pd
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
@@ -126,7 +127,6 @@ def backtest(
         result = engine.run(symbol, hist, signals)
         console.print(result.summary())
 
-    import pandas as pd
     asyncio.run(run())
 
 
@@ -168,7 +168,7 @@ def serve(
 ):
     """Start the web dashboard."""
     import uvicorn
-    from neuraltrade.dashboard.app import create_app
+    from neuraltrade.dashboard import create_app
 
     console.print(f"[green]Starting NeuralTrade dashboard at http://{host}:{port}[/green]")
     app = create_app()

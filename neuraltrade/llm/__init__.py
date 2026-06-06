@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
@@ -15,6 +14,7 @@ class Provider(str, Enum):
     GOOGLE = "google"
     OPENROUTER = "openrouter"
     GROQ = "groq"
+    DEEPSEEK = "deepseek"
     OLLAMA = "ollama"
 
 
@@ -65,6 +65,10 @@ MODEL_CATALOG: dict[str, ModelInfo] = {
     # Groq (ultra-fast inference)
     "groq/llama-3.3-70b": ModelInfo(Provider.GROQ, "llama-3.3-70b-versatile", "Llama 3.3 70B", 128000, True, 0.59, 0.79, "fast", 4),
     "groq/llama-3.1-8b": ModelInfo(Provider.GROQ, "llama-3.1-8b-instant", "Llama 3.1 8B", 128000, True, 0.05, 0.08, "fast", 3),
+
+    # DeepSeek
+    "deepseek/deepseek-chat": ModelInfo(Provider.DEEPSEEK, "deepseek-chat", "DeepSeek V3", 128000, True, 0.27, 1.10, "fast", 4),
+    "deepseek/deepseek-reasoner": ModelInfo(Provider.DEEPSEEK, "deepseek-reasoner", "DeepSeek R1", 128000, True, 0.55, 2.19, "medium", 5),
 }
 
 
@@ -133,6 +137,9 @@ class LLMRouter:
         elif provider == "groq":
             from .providers.groq_client import GroqClient
             client = GroqClient(self.config.groq_key)
+        elif provider == "deepseek":
+            from .providers.deepseek_client import DeepSeekClient
+            client = DeepSeekClient(self.config.deepseek_key)
         else:
             raise ValueError(f"Unknown provider: {provider}")
 
@@ -148,6 +155,7 @@ class LLMRouter:
                 "google": bool(self.config.google_key),
                 "openrouter": bool(self.config.openrouter_key),
                 "groq": bool(self.config.groq_key),
+                "deepseek": bool(self.config.deepseek_key),
             }
             model_key = recommend_model(task, has_keys)
 

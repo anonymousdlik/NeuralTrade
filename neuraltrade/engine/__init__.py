@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass, field
-from datetime import datetime
 from typing import Any
 
 import pandas as pd
@@ -143,10 +141,6 @@ class BacktestEngine:
         final_value = capital + (position * final_price)
         total_return = (final_value - self.initial_capital) / self.initial_capital * 100
 
-        # Calculate metrics
-        winning = [t for t in trades if t.action == "SELL" and t.value > 0]
-        losing = [t for t in trades if t.action == "SELL" and t.value <= 0]
-
         # Sharpe ratio (simplified)
         if len(equity_curve) > 1:
             values = [e["value"] for e in equity_curve]
@@ -160,8 +154,35 @@ class BacktestEngine:
         years = max(days / 365.25, 0.01)
         annual_return = ((final_value / self.initial_capital) ** (1 / years) - 1) * 100
 
-        sell_trades = [t for t in trades if t.action == "SELL"]
-        win_rate = (len(winning) / len(sell_trades) * 100) if sell_trades else 0
+        # Matched buy/sell pair metrics
+        buy_price = 0.0
+        winning = 0
+        losing = 0
+        total_win_pct = 0.0
+        total_loss_pct = 0.0
+        gross_profit = 0.0
+        gross_loss = 0.0
+
+        for t in trades:
+            if t.action == "BUY":
+                buy_price = t.price
+            elif t.action == "SELL" and buy_price > 0:
+                pnl_pct = (t.price - buy_price) / buy_price * 100
+                if pnl_pct > 0:
+                    winning += 1
+                    total_win_pct += pnl_pct
+                    gross_profit += t.value - (t.quantity * buy_price)
+                else:
+                    losing += 1
+                    total_loss_pct += abs(pnl_pct)
+                    gross_loss += (t.quantity * buy_price) - t.value
+                buy_price = 0.0
+
+        sell_trades = winning + losing
+        win_rate = (winning / sell_trades * 100) if sell_trades > 0 else 0
+        avg_win = total_win_pct / winning if winning > 0 else 0
+        avg_loss = total_loss_pct / losing if losing > 0 else 0
+        profit_factor = gross_profit / gross_loss if gross_loss > 0 else (gross_profit if gross_profit > 0 else 0)
 
         return BacktestResult(
             symbol=symbol,
@@ -175,11 +196,11 @@ class BacktestEngine:
             max_drawdown_pct=round(max_drawdown, 2),
             win_rate=round(win_rate, 1),
             total_trades=len(trades),
-            winning_trades=len(winning),
-            losing_trades=len(losing),
-            avg_win_pct=0.0,
-            avg_loss_pct=0.0,
-            profit_factor=0.0,
+            winning_trades=winning,
+            losing_trades=losing,
+            avg_win_pct=round(avg_win, 2),
+            avg_loss_pct=round(avg_loss, 2),
+            profit_factor=round(profit_factor, 2),
             trades=trades,
             equity_curve=equity_curve,
         )
